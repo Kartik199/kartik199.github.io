@@ -3,7 +3,7 @@ import SectionTitle from './SectionTitle'
 
 const PARAGRAPHS = [
   "I'm a backend engineer based in Chennai, India, with 5+ years building distributed, event-driven commerce systems at scale at Tata Consultancy Services.",
-  "I've owned the full architecture lifecycle — from CIAM identity migrations serving 15+ downstream services to Kafka-backed order fulfillment pipelines handling 100,000+ peak users at 99.9%+ availability through Christmas peaks and flash sales.",
+  "I've owned the full architecture lifecycle, from CIAM identity migrations serving 15+ downstream services to Kafka-backed order fulfillment pipelines handling 100,000+ peak users at 99.9%+ availability through Christmas peaks and flash sales.",
   "My focus is on systems that fail gracefully: idempotent consumers, dead-letter queues, fail-open strategies. The interesting engineering is always in the edge cases.",
 ]
 

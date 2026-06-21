@@ -5,12 +5,12 @@ import { personal } from '../data/resume'
 /* ── Terminal sequence ───────────────────────────────────────────── */
 const SEQUENCE = [
   { type: 'cmd', text: 'whoami' },
-  { type: 'out', text: 'Kartikeyan Sundaresan — Backend Engineer @ TCS' },
+  { type: 'out', text: 'Kartikeyan Sundaresan, Backend Engineer @ TCS' },
   { type: 'cmd', text: 'git log --oneline -4' },
   { type: 'out', text: 'a3f9d12 feat: kafka dlq + idempotency' },
-  { type: 'out', text: 'd8c3e01 fix: oauth2 jwt — stateless auth' },
+  { type: 'out', text: 'd8c3e01 fix: oauth2 jwt, stateless auth' },
   { type: 'out', text: '0f71a2b perf: redis lua, no race conds' },
-  { type: 'out', text: 'c9e4f8b feat: oms split — £1.2m lift' },
+  { type: 'out', text: 'c9e4f8b feat: oms split, £1.2m lift' },
   { type: 'cmd', text: './GondorGates --benchmark' },
   { type: 'out', text: 'http_req_duration: avg=7ms  p(95)=14ms  max=31ms' },
   { type: 'out', text: 'http_reqs: ~449/s  VUs: 100  checks: 100% ✓' },
@@ -87,7 +87,7 @@ function TerminalWindow() {
           className="ml-auto text-xs font-mono"
           style={{ color: 'var(--terminal-muted)' }}
         >
-          bash — kartik199
+          bash: kartik199
         </span>
       </div>
 
