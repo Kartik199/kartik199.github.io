@@ -55,6 +55,8 @@ const RESPONSES = {
 }
 
 /* ── Terminal window ─────────────────────────────────────────────── */
+const hasPhysicalKeyboard = () => window.matchMedia('(hover: hover) and (pointer: fine)').matches
+
 function TerminalWindow() {
   const [lines, setLines] = useState([])
   const [cursorOn, setCursorOn] = useState(true)
@@ -74,9 +76,9 @@ function TerminalWindow() {
     if (bodyRef.current) bodyRef.current.scrollTop = bodyRef.current.scrollHeight
   }, [lines, input])
 
-  // Show hint 2.5s after animation ends
+  // Show hint 2.5s after animation ends — only on devices with a physical keyboard
   useEffect(() => {
-    if (!done) return
+    if (!done || !hasPhysicalKeyboard()) return
     const t = setTimeout(() => setShowHint(true), 2500)
     return () => clearTimeout(t)
   }, [done])
@@ -264,8 +266,8 @@ function TerminalWindow() {
           )
         })}
 
-        {/* Interactive prompt after animation */}
-        {done && (
+        {/* Interactive prompt after animation — hidden on touch-only devices */}
+        {done && hasPhysicalKeyboard() && (
           <>
             <div className="leading-relaxed">
               <span style={{ color: 'var(--terminal-accent)' }}>❯ </span>
