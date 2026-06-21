@@ -47,7 +47,7 @@ const RESPONSES = {
     'LinkedIn   linkedin.com/in/kartikeyan-sundaresan',
   ],
   ls:            ['GondorGates/   Selvora/   mind-the-lines/'],
-  'ls ./projects': ['GondorGates/   Selvora/   mind-the-lines/'],
+  'ls projects': ['GondorGates/   Selvora/   mind-the-lines/'],
   ping:          ['pong'],
   exit:          ['Nice try.'],
   'rm -rf /':    ['Running on a distroless container. Nothing to delete.'],

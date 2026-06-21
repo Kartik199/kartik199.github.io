@@ -1,15 +1,16 @@
-import { useEffect } from 'react'
+import { useEffect, lazy, Suspense } from 'react'
 import useTheme from './hooks/useTheme'
 import useScrollSpy from './hooks/useScrollSpy'
 import CursorSpotlight from './components/CursorSpotlight'
 import Navbar from './components/Navbar'
 import Hero from './components/Hero'
-import About from './components/About'
-import Experience from './components/Experience'
-import Projects from './components/Projects'
-import Skills from './components/Skills'
-import Education from './components/Education'
-import Footer from './components/Footer'
+
+const About = lazy(() => import('./components/About'))
+const Experience = lazy(() => import('./components/Experience'))
+const Projects = lazy(() => import('./components/Projects'))
+const Skills = lazy(() => import('./components/Skills'))
+const Education = lazy(() => import('./components/Education'))
+const Footer = lazy(() => import('./components/Footer'))
 
 const NAV_SECTIONS = ['about', 'experience', 'projects', 'skills', 'education']
 
@@ -32,13 +33,17 @@ export default function App() {
       />
       <main>
         <Hero />
-        <About />
-        <Experience />
-        <Projects />
-        <Skills />
-        <Education />
+        <Suspense fallback={null}>
+          <About />
+          <Experience />
+          <Projects />
+          <Skills />
+          <Education />
+        </Suspense>
       </main>
-      <Footer />
+      <Suspense fallback={null}>
+        <Footer />
+      </Suspense>
     </div>
   )
 }
