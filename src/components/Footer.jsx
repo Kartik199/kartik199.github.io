@@ -9,32 +9,54 @@ const links = [
 
 export default function Footer() {
   return (
-    <footer
-      className="py-10 mt-8"
-      style={{ borderTop: '1px solid var(--border)' }}
-    >
-      <div className="max-w-6xl mx-auto px-6 flex flex-col sm:flex-row items-center justify-between gap-4">
-        <p className="text-sm" style={{ color: 'var(--text-muted)' }}>
-          © {new Date().getFullYear()} Kartikeyan Sundaresan
-        </p>
-        <div className="flex items-center gap-5">
+    <footer style={{ borderTop: '1px solid var(--border)' }}>
+
+      {/* Get in touch strip */}
+      <div className="max-w-6xl mx-auto px-6 py-14 flex flex-col items-center text-center gap-6">
+        <div className="space-y-2">
+          <h2 className="text-2xl font-bold" style={{ color: 'var(--text)' }}>
+            Get in Touch
+          </h2>
+          <p className="text-sm" style={{ color: 'var(--text-muted)' }}>
+            Open to backend and platform engineering roles. Always up for a good conversation.
+          </p>
+        </div>
+
+        <div className="flex flex-wrap justify-center gap-3">
           {links.map(({ icon: Icon, href, label }) => (
             <a
               key={label}
               href={href}
               target={href.startsWith('mailto') ? undefined : '_blank'}
               rel="noopener noreferrer"
-              aria-label={label}
-              className="transition-colors duration-200"
-              style={{ color: 'var(--text-muted)' }}
-              onMouseEnter={e => e.currentTarget.style.color = 'var(--accent)'}
-              onMouseLeave={e => e.currentTarget.style.color = 'var(--text-muted)'}
+              className="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm font-medium transition-all duration-200"
+              style={{ border: '1px solid var(--border)', color: 'var(--text)' }}
+              onMouseEnter={e => {
+                e.currentTarget.style.borderColor = 'var(--accent)'
+                e.currentTarget.style.color = 'var(--accent)'
+              }}
+              onMouseLeave={e => {
+                e.currentTarget.style.borderColor = 'var(--border)'
+                e.currentTarget.style.color = 'var(--text)'
+              }}
             >
-              <Icon size={18} />
+              <Icon size={15} />
+              {label}
             </a>
           ))}
         </div>
       </div>
+
+      {/* Copyright */}
+      <div
+        className="max-w-6xl mx-auto px-6 py-5"
+        style={{ borderTop: '1px solid var(--border)' }}
+      >
+        <p className="text-xs text-center" style={{ color: 'var(--text-muted)' }}>
+          © {new Date().getFullYear()} Kartikeyan Sundaresan
+        </p>
+      </div>
+
     </footer>
   )
 }

@@ -6,11 +6,9 @@ import { personal } from '../data/resume'
 const SEQUENCE = [
   { type: 'cmd', text: 'whoami' },
   { type: 'out', text: 'Kartikeyan Sundaresan, Backend Engineer @ TCS' },
-  { type: 'cmd', text: 'git log --oneline -4' },
+  { type: 'cmd', text: 'git log --oneline -2' },
   { type: 'out', text: 'a3f9d12 feat: kafka dlq + idempotency' },
   { type: 'out', text: 'd8c3e01 fix: oauth2 jwt, stateless auth' },
-  { type: 'out', text: '0f71a2b perf: redis lua, no race conds' },
-  { type: 'out', text: 'c9e4f8b feat: oms split, £1.2m lift' },
   { type: 'cmd', text: './GondorGates --benchmark' },
   { type: 'out', text: 'http_req_duration: avg=7ms  p(95)=14ms  max=31ms' },
   { type: 'out', text: 'http_reqs: ~449/s  VUs: 100  checks: 100% ✓' },
@@ -18,12 +16,54 @@ const SEQUENCE = [
   { type: 'out', text: 'GondorGates/   Selvora/   mind-the-lines/' },
 ]
 
+/* ── Interactive command responses ───────────────────────────────── */
+const RESPONSES = {
+  help: [
+    '  whoami     who is this person',
+    '  skills     tech stack',
+    '  contact    get in touch',
+    '  ping       ...',
+    '  clear      clear the terminal',
+    '  reload     replay the intro',
+    '  exit       ...',
+  ],
+  whoami: [
+    'Kartikeyan Sundaresan',
+    'Backend Engineer @ TCS, Chennai',
+    'Java · Spring · Kafka · Redis · 5+ years',
+  ],
+  skills: [
+    'Languages    Java, SQL',
+    'Frameworks   Spring Boot, Spring WebFlux',
+    'Messaging    Apache Kafka',
+    'Caching      Redis',
+    'Databases    PostgreSQL, Oracle SQL',
+    'DevOps       Docker, GitHub Actions',
+    'Monitoring   Prometheus, Grafana, Dynatrace',
+  ],
+  contact: [
+    'Email      skartikeyan121999@gmail.com',
+    'GitHub     github.com/Kartik199',
+    'LinkedIn   linkedin.com/in/kartikeyan-sundaresan',
+  ],
+  ls:            ['GondorGates/   Selvora/   mind-the-lines/'],
+  'ls ./projects': ['GondorGates/   Selvora/   mind-the-lines/'],
+  ping:          ['pong'],
+  exit:          ['Nice try.'],
+  'rm -rf /':    ['Running on a distroless container. Nothing to delete.'],
+  'rm -rf':      ['Running on a distroless container. Nothing to delete.'],
+}
+
 /* ── Terminal window ─────────────────────────────────────────────── */
 function TerminalWindow() {
   const [lines, setLines] = useState([])
   const [cursorOn, setCursorOn] = useState(true)
   const [done, setDone] = useState(false)
+  const [input, setInput] = useState('')
+  const [showHint, setShowHint] = useState(false)
+  const [replay, setReplay] = useState(0)
   const bodyRef = useRef(null)
+  const inputRef = useRef('')
 
   useEffect(() => {
     const id = setInterval(() => setCursorOn(v => !v), 530)
@@ -31,12 +71,24 @@ function TerminalWindow() {
   }, [])
 
   useEffect(() => {
-    if (bodyRef.current) {
-      bodyRef.current.scrollTop = bodyRef.current.scrollHeight
-    }
-  }, [lines])
+    if (bodyRef.current) bodyRef.current.scrollTop = bodyRef.current.scrollHeight
+  }, [lines, input])
 
+  // Show hint 2.5s after animation ends
   useEffect(() => {
+    if (!done) return
+    const t = setTimeout(() => setShowHint(true), 2500)
+    return () => clearTimeout(t)
+  }, [done])
+
+  // Animation sequence — re-runs on reload
+  useEffect(() => {
+    setLines([])
+    setDone(false)
+    setInput('')
+    setShowHint(false)
+    inputRef.current = ''
+
     let cancelled = false
     const sleep = ms => new Promise(r => setTimeout(r, ms))
 
@@ -68,7 +120,83 @@ function TerminalWindow() {
 
     run()
     return () => { cancelled = true }
-  }, [])
+  }, [replay])
+
+  // Interactive keydown — active only after animation ends
+  useEffect(() => {
+    if (!done) return
+
+    const addOut = (texts, baseDelay = 0) => {
+      texts.forEach((text, i) => {
+        setTimeout(() => {
+          setLines(prev => [...prev, { type: 'out', text }])
+        }, baseDelay + i * 80)
+      })
+    }
+
+    const respond = (cmd) => {
+      setShowHint(false)
+      if (cmd === '') return
+
+      setLines(prev => [...prev, { type: 'cmd', text: cmd }])
+
+      if (cmd === 'clear') {
+        setTimeout(() => setLines([]), 60)
+        return
+      }
+
+      if (cmd === 'reload') {
+        setReplay(prev => prev + 1)
+        return
+      }
+
+      if (cmd === 'vim') {
+        addOut(['You are in vim now.', 'Good luck getting out.'])
+        setTimeout(() => {
+          setLines(prev => [...prev, { type: 'cmd', text: ':q' }])
+          setTimeout(() => {
+            addOut(['E37: No write since last change. Add ! to override.'])
+            setTimeout(() => {
+              setLines(prev => [...prev, { type: 'cmd', text: ':q!' }])
+              setTimeout(() => addOut(['Goodbye.']), 500)
+            }, 700)
+          }, 500)
+        }, 1200)
+        return
+      }
+
+      const resp = RESPONSES[cmd]
+      if (resp) {
+        addOut(resp)
+      } else {
+        addOut([`bash: ${cmd}: command not found`])
+      }
+    }
+
+    const onKey = (e) => {
+      if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return
+      if (e.metaKey || e.ctrlKey || e.altKey) return
+
+      if (e.key === 'Enter') {
+        const cmd = inputRef.current.trim().toLowerCase()
+        respond(cmd)
+        inputRef.current = ''
+        setInput('')
+      } else if (e.key === 'Backspace') {
+        e.preventDefault()
+        inputRef.current = inputRef.current.slice(0, -1)
+        setInput(inputRef.current)
+        setShowHint(false)
+      } else if (e.key.length === 1) {
+        inputRef.current += e.key
+        setInput(inputRef.current)
+        setShowHint(false)
+      }
+    }
+
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  }, [done])
 
   return (
     <div
@@ -91,7 +219,7 @@ function TerminalWindow() {
         </span>
       </div>
 
-      {/* Body — scrolls internally so page position is never affected */}
+      {/* Body */}
       <div
         ref={bodyRef}
         className="p-5 font-mono text-sm space-y-1.5 overflow-y-auto"
@@ -121,10 +249,7 @@ function TerminalWindow() {
                   )}
                 </span>
               ) : (
-                <span
-                  className="pl-4"
-                  style={{ color: 'var(--terminal-muted)', opacity: line.dim ? 0.55 : 1 }}
-                >
+                <span className="pl-4" style={{ color: 'var(--terminal-muted)', whiteSpace: 'pre' }}>
                   {/^[0-9a-f]{7} /.test(line.text) ? (
                     <>
                       <span style={{ color: 'var(--terminal-accent)', opacity: 0.8 }}>
@@ -138,22 +263,32 @@ function TerminalWindow() {
             </div>
           )
         })}
+
+        {/* Interactive prompt after animation */}
         {done && (
-          <div className="leading-relaxed">
-            <span style={{ color: 'var(--terminal-accent)' }}>❯ </span>
-            <span
-              style={{
-                display: 'inline-block',
-                width: '2px',
-                height: '1em',
-                background: 'var(--terminal-accent)',
-                marginLeft: '1px',
-                verticalAlign: 'middle',
-                opacity: cursorOn ? 1 : 0,
-                transition: 'opacity 0.1s',
-              }}
-            />
-          </div>
+          <>
+            <div className="leading-relaxed">
+              <span style={{ color: 'var(--terminal-accent)' }}>❯ </span>
+              <span style={{ color: 'var(--terminal-text)' }}>{input}</span>
+              <span
+                style={{
+                  display: 'inline-block',
+                  width: '2px',
+                  height: '1em',
+                  background: 'var(--terminal-accent)',
+                  marginLeft: '1px',
+                  verticalAlign: 'middle',
+                  opacity: cursorOn ? 1 : 0,
+                  transition: 'opacity 0.1s',
+                }}
+              />
+            </div>
+            {showHint && (
+              <div style={{ color: 'var(--terminal-muted)', opacity: 0.4, fontSize: '0.8em' }}>
+                # try: help
+              </div>
+            )}
+          </>
         )}
       </div>
     </div>

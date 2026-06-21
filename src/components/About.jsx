@@ -4,7 +4,7 @@ import SectionTitle from './SectionTitle'
 const PARAGRAPHS = [
   "I'm a backend engineer based in Chennai, India, with 5+ years building distributed, event-driven commerce systems at scale at Tata Consultancy Services.",
   "I've owned the full architecture lifecycle, from CIAM identity migrations serving 15+ downstream services to Kafka-backed order fulfillment pipelines handling 100,000+ peak users at 99.9%+ availability through Christmas peaks and flash sales.",
-  "My focus is on systems that fail gracefully: idempotent consumers, dead-letter queues, fail-open strategies. The interesting engineering is always in the edge cases.",
+  "What I find most interesting about backend work is the gap between code that passes tests and systems that hold up in production. Most of that gap lives in the failure modes you anticipate upfront rather than discover later.",
 ]
 
 export default function About() {
